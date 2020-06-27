@@ -19,6 +19,7 @@ namespace juegoIA
 			List<int> maquina=new List<int>(){3,4};			
 			ArbolGeneral<int> ArbolCompleto=CompletarRama(new ArbolGeneral<int>(0),usuario,maquina,Turno,limite);
 			ArbolCompleto.PorNivelesMarcadoFin();
+			InstalacionHeuristica(ArbolCompleto,Turno,1).PorNivelesMarcadoFin();
 
 		}
 		public ArbolGeneral<int> CompletarRama(ArbolGeneral<int> Hijo,List<int> CartasUsuario,List<int> CartasMaquina,bool Turno,int limite)
@@ -56,7 +57,39 @@ namespace juegoIA
 			}
 			return Hijo;
 		}
-		
+		public ArbolGeneral<int> InstalacionHeuristica(ArbolGeneral<int> ArbolMiniMax,bool Turno,int limite)
+		{
+			if(limite<0)
+			{
+				if(Turno==true)
+				{
+					//En el nodo de mi arbol que sobrepase el limite se cortar y se debe poner como hijo de este el dato heuristico (-1 gano maquina,-2 gano usuario)
+					ArbolMiniMax.ConvertirEnHoja();
+					ArbolGeneral<int> Heuristic=new ArbolGeneral<int>(-1);
+					ArbolMiniMax.agregarHijo(Heuristic);
+					return Heuristic;
+				}
+				else{
+					ArbolMiniMax.ConvertirEnHoja();
+					ArbolGeneral<int> Heuristic=new ArbolGeneral<int>(-2);
+					ArbolMiniMax.agregarHijo(Heuristic);
+					return Heuristic;
+				}
+			}
+			else{
+				foreach(var hijo in ArbolMiniMax.getHijos())
+				{
+//					int LimiteAux=limite-ArbolMiniMax.getDatoRaiz(); corregido /
+					int LimiteAux=limite-hijo.getDatoRaiz();
+//					if(LimiteAux<0)
+//					{
+//						hijo.crearHoja();
+//					}
+					InstalacionHeuristica(hijo,!Turno,LimiteAux);
+				}
+				return ArbolMiniMax;
+			}
+		}
 		
 		public override int descartarUnaCarta()
 		{
