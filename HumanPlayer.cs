@@ -9,13 +9,13 @@ namespace juegoIA
 
 	public class HumanPlayer : Jugador
 	{
+		public HumanPlayer(){}
 		private List<int> naipes = new List<int>();
 		private List<int> naipesComputer = new List<int>();
 		private int limite;
 		private bool random_card = false;
-		
-		
-		public HumanPlayer(){}
+		private int cartadeloponente;
+
 		
 		public HumanPlayer(bool random_card)
 		{
@@ -28,30 +28,84 @@ namespace juegoIA
 			this.naipesComputer = cartasOponente;
 			this.limite = limite;
 		}
-		
 		public override int descartarUnaCarta()
 		{
 			int carta = 0;
-			Console.WriteLine("Naipes disponibles (Usuario):");
+			Console.Write("Naipes disponibles (Usuario):");
 			for (int i = 0; i < naipes.Count; i++) {
-				Console.Write(naipes[i].ToString());
-				if (i<naipes.Count-1) {
-					Console.Write(", ");
-				}
+				Console.Write("["+naipes[i].ToString()+"]");
+//				if (i<naipes.Count-1) {
+//					Console.Write(", ");
+//				}
 			}
-		
 			Console.WriteLine();
-			if (!random_card) {
-				Console.Write("Ingrese naipe:");
+			if (!random_card)
+			{
+				Console.Write("Ingrese naipe               :");
 				string entrada = Console.ReadLine();
-				
+				switch(entrada)
+				{
+					case "101":
+						HumanPlayer.ArbolEuristico.CortarArbol(cartadeloponente).PorNivelesMarcadoFin();
+						break;
+					case "102":
+						HumanPlayer.ArbolEuristico.CortarArbol(cartadeloponente).Jugadas(new List<int>());
+						break;
+					case "103":
+						Console.Write("Imprimir Arbol en el Nivel: ");
+						int profundidad=int.Parse(Console.ReadLine());
+						Console.Write("[Nivel-"+profundidad+"]: ");
+						HumanPlayer.ArbolEuristico.CortarArbol(cartadeloponente).profundidad(profundidad,profundidad);
+						Console.WriteLine();
+						break;
+					case "104":
+						//Nuevo Juego
+						Menus nuevo=new Menus();
+						nuevo.IniciandoJuego();
+						break;
+					case "105":
+						//Cerrar Juego
+						Environment.Exit(0);
+						break;
+						
+				}
 				Int32.TryParse(entrada, out carta);
+
 				while (!naipes.Contains(carta)) {
-					Console.Write("Opcion Invalida.Ingrese otro naipe:");
+//					Console.Write("Opcion Invalida.Ingrese otro naipe:");
+					Console.Write("Ingrese naipe               :");
 					entrada = Console.ReadLine();
+					switch(entrada)
+					{
+						case "101":
+							HumanPlayer.ArbolEuristico.CortarArbol(cartadeloponente).PorNivelesMarcadoFin();
+							break;
+						case "102":
+							HumanPlayer.ArbolEuristico.CortarArbol(cartadeloponente).Jugadas(new List<int>());
+							break;
+						case "103":
+							Console.Write("Imprimir Arbol en el Nivel: ");
+							int profundidad=int.Parse(Console.ReadLine());
+							Console.Write("[Nivel-"+profundidad+"]: ");
+							HumanPlayer.ArbolEuristico.CortarArbol(cartadeloponente).profundidad(profundidad,profundidad);
+							Console.WriteLine();
+							break;
+						case "104":
+							//Nuevo Juego
+							Menus nuevo=new Menus();
+							nuevo.IniciandoJuego();
+							break;
+						case "105":
+							//Cerrar Juego
+							Environment.Exit(0);
+							break;
+							
+					}
 					Int32.TryParse(entrada, out carta);
 				}
-			} else {
+			}
+			else
+			{
 				var random = new Random();
 				int index = random.Next(naipes.Count);
 				carta = naipes[index];
@@ -60,9 +114,12 @@ namespace juegoIA
 			
 			return carta;
 		}
-		
-		public override void cartaDelOponente(int carta){
+		public override void cartaDelOponente(int carta)
+		{
+			cartadeloponente=carta;
+			Console.WriteLine("=======================================================================================================================");
+			Console.WriteLine("La carta del oponente es    :"+"["+carta+"]");
+			Console.WriteLine("=======================================================================================================================");
 		}
-		
 	}
 }
