@@ -34,9 +34,6 @@ namespace juegoIA
 			Console.Write("Naipes disponibles (Usuario):");
 			for (int i = 0; i < naipes.Count; i++) {
 				Console.Write("["+naipes[i].ToString()+"]");
-//				if (i<naipes.Count-1) {
-//					Console.Write(", ");
-//				}
 			}
 			Console.WriteLine();
 			if (!random_card)
@@ -52,9 +49,9 @@ namespace juegoIA
 						HumanPlayer.ArbolEuristico.CortarArbol(cartadeloponente).Jugadas(new List<int>());
 						break;
 					case "103":
-						Console.Write("Imprimir Arbol en el Nivel: ");
+						Console.Write("Imprimir nodos del arbol en la Profundidad: ");
 						int profundidad=int.Parse(Console.ReadLine());
-						Console.Write("[Nivel-"+profundidad+"]: ");
+						Console.Write("[Profundidad-"+profundidad+"]: ");
 						HumanPlayer.ArbolEuristico.CortarArbol(cartadeloponente).profundidad(profundidad,profundidad);
 						Console.WriteLine();
 						break;
@@ -70,9 +67,7 @@ namespace juegoIA
 						
 				}
 				Int32.TryParse(entrada, out carta);
-
 				while (!naipes.Contains(carta)) {
-//					Console.Write("Opcion Invalida.Ingrese otro naipe:");
 					Console.Write("Ingrese naipe               :");
 					entrada = Console.ReadLine();
 					switch(entrada)
@@ -84,9 +79,9 @@ namespace juegoIA
 							HumanPlayer.ArbolEuristico.CortarArbol(cartadeloponente).Jugadas(new List<int>());
 							break;
 						case "103":
-							Console.Write("Imprimir Arbol en el Nivel: ");
-							int profundidad=int.Parse(Console.ReadLine());
-							Console.Write("[Nivel-"+profundidad+"]: ");
+							Console.Write("Imprimir nodos del arbol en la Profundidad: ");
+							int profundidad=int.Parse(Console.ReadLine())-1;
+							Console.Write("[Profundidad-"+profundidad+"]: ");
 							HumanPlayer.ArbolEuristico.CortarArbol(cartadeloponente).profundidad(profundidad,profundidad);
 							Console.WriteLine();
 							break;

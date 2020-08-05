@@ -54,49 +54,11 @@ namespace juegoIA
 		{
 			return this.raiz != null && this.getHijos().Count == 0;
 		}
-		public void porNiveles(){
-			Cola<ArbolGeneral<T>> c  = new Cola<ArbolGeneral<T>>();
-			ArbolGeneral<T> arbolAux;
-			
-			c.encolar(this);
-			while(!c.esVacia()){
-				arbolAux = c.desencolar();
-				Console.Write(arbolAux.getDatoRaiz() + " ");
-				
-				if(!this.esHoja()){
-					foreach(var hijo in arbolAux.getHijos())
-						c.encolar(hijo);
-				}
-			}
-		}
-		public void preOrden(){
-			// Procesamos raiz
-			Console.Write(this.getDatoRaiz() + " ");
-			
-			// Hago recursion en todos los hijos
-			if(!this.esHoja()){
-				List<ArbolGeneral<T>> listaHijos = this.getHijos();
-				foreach(var hijo in listaHijos)
-					hijo.preOrden();
-			}
-		}
-		
-		public void postOrden(){
-			// Hago recursion en todos los hijos
-			if(!this.esHoja()){
-				List<ArbolGeneral<T>> listaHijos = this.getHijos();
-				foreach(var hijo in listaHijos)
-					hijo.postOrden();
-			}
-			// Procesamos raiz
-			Console.Write(this.getDatoRaiz() + " ");
-		}
 		public void PorNivelesMarcadoFin()
 		{
-//			Console.WriteLine("[====[RECORRIDO-POR-NIVELES]====]\n");
-			Cola<ArbolGeneral<T>> cola=new Cola<ArbolGeneral<T>>();     //Intancia una cola vacia
-			cola.encolar(this);                             //Obtiene el Nodo Raiz y lo encola
-			cola.encolar(null);                                       //Encola null (para determinar cuando empieza el nuevo nivel)
+			Cola<ArbolGeneral<T>> cola=new Cola<ArbolGeneral<T>>();    //Intancia una cola vacia
+			cola.encolar(this);                                        //Obtiene el Nodo Raiz y lo encola
+			cola.encolar(null);                                        //Encola null (para determinar cuando empieza el nuevo nivel)
 			int nivel=1;
 			Console.WriteLine("=======================================================================================================================");
 			Console.Write("[Nivel-"+nivel+"]: ");
@@ -129,7 +91,7 @@ namespace juegoIA
 			}
 			Console.Write("\n========================================================================================================================");
 		}
-		public List<int> PreordenMaquina(List<int> vacia)
+		public List<int> BuscarJugada(List<int> vacia)
 		{
 			List<int> nueva=vacia;
 			if(Convert.ToInt32(this.getDatoRaiz())!=-1)
@@ -139,28 +101,26 @@ namespace juegoIA
 			List<ArbolGeneral<T>> listaHijos = this.getHijos();
 			foreach(var hijo in listaHijos)
 			{
-				if(Convert.ToInt32(hijo.getDatoRaiz())==-2)
-				{
-					listaHijos.Clear();
-					Console.WriteLine("qweqwe: "+nueva[1]);
-					return nueva;
-				}
-				if(Convert.ToInt32(hijo.getDatoRaiz())==-1)
+				if(Convert.ToInt32(hijo.getDatoRaiz())==-2) //Si encuentra el nodo hoja con datoraiz -2 esa secuencia de nodos por los que paso hasta llegar a este nodo
+					                                        //estara almacenada en la lista con nombre nueva. De esta lista, que representa el cojunto de jugadas, el dato
+					                                        //que se encuentra en la posicion 1 es la siguiente carta a jugar
 				{
 					return nueva;
 				}
-				nueva=hijo.PreordenMaquina(nueva);
+				nueva=hijo.BuscarJugada(nueva);
 				return nueva;
 			}
 			return nueva;
-			
 		}
 		public void profundidad(int n, int profundidad)
 		{
-			var cola=new Cola<NodoGeneral<T>>();
-			cola.encolar(this.getRaiz());
-			cola.encolar(null);
-			int nivel=1;
+			//Este metodo permite realizar la consulta de los datos de los nodos que se encuentran entre dos niveles
+			//si los parametros n=profundidad obtenemos los datos que se encuentran en un determinado nivel. Si los 
+			//decrementamos el nivel en uno obtenemos los datos en una determinada profundidad
+			var cola=new Cola<NodoGeneral<T>>(); 
+			cola.encolar(this.getRaiz());         
+			cola.encolar(null);                    //Encola null para marcar la finalizacion un  nivel.
+			int nivel=1;                           //Cuando finaliza un nivel y comienza uno nuevo la variable nivel incrementa en 1.
 			string datos="";
 			while(!cola.esVacia())
 			{
@@ -169,17 +129,16 @@ namespace juegoIA
 				{
 					cola.encolar(null);
 					nivel++;
-					if (cola.tope() == aux)
-					{
-						cola.desencolar();
+					if (cola.tope() == aux)        //Esta estructura condicional permite evitar un bucle infinito, ya que cuando desencolo un null encolo otro para finalizar un nivel
+					{                              //Cuando consultamos con el metodo tope no estamos desencolando sino preguntando si el siguiente dato a desencolar sera nulo o no. Si
+						cola.desencolar();         //este dato siguiente es nulo lo desencolo y no encolo nada. De esta forma evito que se encolen nulls infinitos.
 					}
-
 				}
 				else
 				{
-					if (nivel>=n && nivel <= profundidad)
-					{
-						Console.Write("["+aux.getDato()+"]");
+					if (nivel>=n && nivel <= profundidad) //Si el nivel coincide con la profundidad, es decir nivel=n=profundidad agrega a mi variable "datos" el  dato del nodo que
+					{                                     //se encuentra en dicha profundidad.
+						Console.Write("["+aux.getDato()+"]"); //Esta impresion elabora una candena con los datos de los nodos que se encuentran en la misma profundidad
 						datos=datos+aux.getDato();
 					}
 
@@ -187,55 +146,48 @@ namespace juegoIA
 						foreach(var hijo in aux.getHijos())
 							cola.encolar(hijo);
 					}
-				}
-				
+				}	
 			}
 		}
 		public ArbolGeneral<T> CortarArbol(int UltimaCartaUsuario)
 		{
 			Cola<ArbolGeneral<T>> c  = new Cola<ArbolGeneral<T>>();
 			ArbolGeneral<T> arbolAux=new ArbolGeneral<T>(null);
-			
 			c.encolar(this);
 			while(!c.esVacia()){
 				arbolAux = c.desencolar();
 				if(Convert.ToInt32(arbolAux.getDatoRaiz())==UltimaCartaUsuario)
 				{
-//					arbolAux.PorNivelesMarcadoFin();
 					return arbolAux;
 				}
-//				Console.Write(arbolAux.getDatoRaiz() + " ");
-				
 				if(!this.esHoja()){
 					foreach(var hijo in arbolAux.getHijos())
 						c.encolar(hijo);
 				}
 			}
-			
 			return arbolAux;
 		}
 		public List<int> Jugadas(List<int> vacia)
 		{
 			List<int> nueva=vacia;
-			
-			if(this.esHoja())
-			{
-				Console.Write("Posible secuencia de Jugada: ");
-				foreach(var jugada in nueva)
+			if(this.esHoja())                                    //Encuentra un nodo hoja
+			{                                                    //
+				Console.Write("Posible secuencia de Jugada: ");  //
+				foreach(var jugada in nueva)                     //Imprime todos los nodos que recorrio hasta llegar al nodo hoja.
 				{
 					Console.Write("["+jugada+"]");
 				}
 				Console.WriteLine("["+this.getDatoRaiz()+"]");
-				return nueva;
 			}
 			else{
 				List<ArbolGeneral<T>> listaHijos = this.getHijos();
-				nueva.Add(Convert.ToInt32(this.getDatoRaiz()));
+				nueva.Add(Convert.ToInt32(this.getDatoRaiz()));   //Todos los nodos que no son hoja los almacena en la lista "nueva"
 				foreach(var hijo in listaHijos)
 				{
 					nueva=hijo.Jugadas(nueva);
 				}
-				nueva.Remove(Convert.ToInt32(this.getDatoRaiz()));
+				nueva.Remove(Convert.ToInt32(this.getDatoRaiz())); //Cuando termina de recorrer los hijos de un nodo elimina ese nodo padre de la lista para
+				                                                   //poder seguir con el siguiente camino
 			}
 			return nueva;
 		}

@@ -7,54 +7,49 @@ namespace juegoIA
 	public class ComputerPlayer: Jugador
 	{
 		public ComputerPlayer(){}
-
-		private List<int> naipesComputer = new List<int>();
-		private int UltimaCartaUsuario;
+		private int UltimaCartaUsuario;		
+		private List<int> naipesComputer;
 		
 		public override void incializar(List<int> cartasPropias, List<int> cartasOponente, int limite)
 		{
-			naipesComputer=cartasPropias;
 			bool Turno=true; //comienza tirando el usuario!
-			//CompletarRama(new ArbolGeneral<int>(0),cartasPropias,cartasOponente,Turno,limite).PorNivelesMarcadoFin();
-			List<int> usuario=new List<int>(){1,2,3};
+			List<int> usuario=new List<int>(){1,2,3}; 
 			List<int> maquina=new List<int>(){4,5,6};
-			ArbolGeneral<int> ArbolCompleto=CompletarRama(new ArbolGeneral<int>(0),usuario,maquina,Turno,limite);
-//			ArbolCompleto.PorNivelesMarcadoFin();
-//			HackMaquina(ArbolCompleto,9,Turno);
-			ArbolGeneral<int> nuevo=InstalacionHeuristica(ArbolCompleto,Turno,7);
-			ArbolEuristico=nuevo;
-//			nuevo.PorNivelesMarcadoFin();
+			naipesComputer=maquina;
+			ArbolGeneral<int> ArbolCompleto=CompletarRama(new ArbolGeneral<int>(0),usuario,maquina,Turno,limite); 
+			ArbolGeneral<int> Arbol=InstalacionHeuristica(ArbolCompleto,Turno,7);
+			ArbolEuristico=Arbol;  //Guarda el Arbol Heuristico en el Campo de la clase base llamado "ArbolEuristico" para que todas las
+			                       //clases que hereden de esta clase base tambien tengan disponible este dato.
 		}
 		public ArbolGeneral<int> CompletarRama(ArbolGeneral<int> Hijo,List<int> CartasUsuario,List<int> CartasMaquina,bool Turno,int limite)
 		{
+			//Empieza Jugando Usuario->Turno=true(Juega Usuario)->Turno=false(Juega Maquina)
 			List<int> cartas=new List<int>();
 			if(Turno==true)
 			{
-				cartas.AddRange(CartasUsuario);
+				cartas.AddRange(CartasUsuario); //Si Juega Usuario guardo todas las cartas de este en la variable "cartas"
 			}
 			else
 			{
-				cartas.AddRange(CartasMaquina);
+				cartas.AddRange(CartasMaquina); //Si Juega Maquina guardo todas las cartas de este en la variable "cartas"
 			}
-			foreach(int carta in cartas)
+			foreach(int carta in cartas)        //Recorre la lista de cartas Correspondiente al Jugador
 			{
-				//Si mi funcion Heuristica, es decir si la base de mi ABGeneral tiene "getDatoRaiz=-1" gana Usuario, si tiene "getDatoRaiz=-2" gana Maquina...
-				ArbolGeneral<int> hijo=new ArbolGeneral<int>(carta);
-				Hijo.agregarHijo(hijo);
-				int limiteaAux=limite-carta;
+				ArbolGeneral<int> hijo=new ArbolGeneral<int>(carta); //Realiza una instancia de ArbolGeneral con DatoRaiz carta
+				Hijo.agregarHijo(hijo);                              //Agrega al Arbol la instancia hijo creada anteriormente
+				int limiteaAux=limite-carta;                         //Decrementa el limite en base a el dato de la carta
 				List<int> cartasrestantes=new List<int>();
-				cartasrestantes.AddRange(cartas);
-				cartasrestantes.Remove(carta);
-				if(limite>=0)
+				cartasrestantes.AddRange(cartas);                    //Guardo todas las cartas en lista cartas restantes
+				cartasrestantes.Remove(carta);                       // y elimino la carta que se esta recorriendo de la lista "cartas".
+				if(limite>=0)                                        //Si limite es menor a cero empieza a armar la siguiente rama
 				{
 					if(Turno==true)
 					{
-						bool turnito=false;
-						CompletarRama(hijo,cartasrestantes,CartasMaquina,turnito,limiteaAux);
-					}
-					else{
-						bool turnito=true;
-						CompletarRama(hijo,CartasUsuario,cartasrestantes,turnito,limiteaAux);
+						CompletarRama(hijo,cartasrestantes,CartasMaquina,!Turno,limiteaAux); //Hace llamada recursiva cambia el turno, envia la lista con
+					}                                                                        //la carta eliminada y el limite reducido
+					else
+					{
+						CompletarRama(hijo,CartasUsuario,cartasrestantes,!Turno,limiteaAux);
 					}
 				}
 			}
@@ -62,109 +57,54 @@ namespace juegoIA
 		}
 		public ArbolGeneral<int> InstalacionHeuristica(ArbolGeneral<int> ArbolMiniMax,bool Turno,int limite)
 		{
+			//Si mi funcion Heuristica, es decir si la base de mi ABGeneral tiene "getDatoRaiz=-1" gana Usuario
+			//si tiene "getDatoRaiz=-2" gana Maquina...
 			if(limite<0)
 			{
+				//En el nodo de mi arbol que se sobrepase el limite se corta y se debe poner como hijo de este el dato heuristico (-1 gano maquina,-2 gano usuario)
+				//dependiendo de quien sea el turno.
 				if(Turno==true)
 				{
-					//En el nodo de mi arbol que sobrepase el limite se cortar y se debe poner como hijo de este el dato heuristico (-1 gano maquina,-2 gano usuario)
-					ArbolMiniMax.ConvertirEnHoja();
+					ArbolMiniMax.ConvertirEnHoja(); //El nodo en el que se alcanza el limite se convierte en Hoja y en este se agrega el dato heuristico
 					ArbolGeneral<int> Heuristic=new ArbolGeneral<int>(-1);
 					ArbolMiniMax.agregarHijo(Heuristic);
-					return Heuristic;
 				}
 				else
 				{
 					ArbolMiniMax.ConvertirEnHoja();
 					ArbolGeneral<int> Heuristic=new ArbolGeneral<int>(-2);
 					ArbolMiniMax.agregarHijo(Heuristic);
-					return Heuristic;
 				}
 			}
+			//Mientras no se supere el limite recorro los hijos de mi nodo
 			else
 			{
 				foreach(var hijo in ArbolMiniMax.getHijos())
 				{
-//					int LimiteAux=limite-ArbolMiniMax.getDatoRaiz(); corregido /
 					int LimiteAux=limite-hijo.getDatoRaiz();
-//					if(LimiteAux<0)
-//					{
-//						hijo.crearHoja();
-//					}
 					InstalacionHeuristica(hijo,!Turno,LimiteAux);
 				}
-				return ArbolMiniMax;
 			}
+			return ArbolMiniMax;
 		}
-		public ArbolGeneral<int> ArbolHeuristico(ArbolGeneral<int> Hijo,List<int> CartasUsuario,List<int> CartasMaquina,bool Turno,int limite)
-		{
-			List<int> cartas=new List<int>();
-			if(Turno==true)
-			{
-				cartas.AddRange(CartasUsuario);
-			}
-			else
-			{
-				cartas.AddRange(CartasMaquina);
-			}
-			foreach(int carta in cartas)
-			{
-				//Si mi funcion Heuristica, es decir si la base de mi ABGeneral tiene "getDatoRaiz=-1" gana Usuario, si tiene "getDatoRaiz=-2" gana Maquina...
-				ArbolGeneral<int> hijo=new ArbolGeneral<int>(carta);
-				Hijo.agregarHijo(hijo);
-				int limiteaAux=limite-carta;
-				List<int> cartasrestantes=new List<int>();
-				cartasrestantes.AddRange(cartas);
-				cartasrestantes.Remove(carta);
-				if((limite<0)&&Turno==true)
-				{
-					ArbolGeneral<int> Heuristic=new ArbolGeneral<int>(-2);
-					hijo.agregarHijo(Heuristic);
-				}
-				if((limite<0)&&Turno==false)
-				{
-					ArbolGeneral<int> Heuristic=new ArbolGeneral<int>(-1);
-					hijo.agregarHijo(Heuristic);
-				}
-				if(limite>=0)
-				{
-					if(Turno==true)
-					{
-						bool turnito=false;
-						ArbolHeuristico(hijo,cartasrestantes,CartasMaquina,turnito,limiteaAux);
-					}
-					else{
-						bool turnito=true;
-						ArbolHeuristico(hijo,CartasUsuario,cartasrestantes,turnito,limiteaAux);
-					}
-				}
-			}
-			return Hijo;
-		}	
-		public int  JuagadaDeLaMaquina()
-		{
-			ArbolGeneral<int> NuevoArbol=ArbolEuristico.CortarArbol(UltimaCartaUsuario);
-			ArbolEuristico=NuevoArbol;
-			List<int> nueva=new List<int>();
-			List<int> SiguienteJugada=NuevoArbol.PreordenMaquina(nueva);
-			Console.ReadKey();
-			Console.WriteLine("Carta de La Maquina:         "+"["+SiguienteJugada[1]+"]");
-			return SiguienteJugada[1];
-		}
-		
 		public override int descartarUnaCarta()
 		{
-			int carta = 0;
 			Console.Write("Naipes disponibles (Maquina):");
 			for (int i = 0; i < naipesComputer.Count; i++) {
-				Console.Write("["+naipesComputer[i].ToString()+"]");
+				Console.Write("["+naipesComputer[i].ToString()+"]");  //Muestra las cartas que tiene disponible la Maquina
 			}
 			Console.WriteLine();
-			carta = JuagadaDeLaMaquina();
-			return carta;
+			ArbolGeneral<int> NuevoArbol=ArbolEuristico.CortarArbol(UltimaCartaUsuario); //Corta el arbol en la ultima jugada que realizo el Usuario
+			ArbolEuristico=NuevoArbol;
+			List<int> SiguienteJugada=NuevoArbol.BuscarJugada(new List<int>());       //En el arbol cortado busca el camino que tenga como dato Heuristico -2
+			                                                                             //y lo guarda en la lista SiguienteJugada
+			Console.WriteLine("Carta de La Maquina:         "+"["+SiguienteJugada[1]+"]");
+			                                                                            //Devuelve la carta a jugar. Esta seria la carta que se ecuentra en la 
+			return  SiguienteJugada[1];;                                          //posicion 1 de mi lista que guardo el camino que tiene el dato Heuristico -2.
 		}
 		public override void cartaDelOponente(int carta)
 		{
-			UltimaCartaUsuario=carta;
+			UltimaCartaUsuario=carta;                                  
 			Console.WriteLine("=======================================================================================================================");
 			Console.WriteLine("La carta del oponente es    :"+"["+carta+"]");
 			Console.WriteLine("=======================================================================================================================");

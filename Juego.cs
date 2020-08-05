@@ -39,7 +39,7 @@ namespace juegoIA
 						break;
 				}
 			}
-			while(modulo<4);
+			while(modulo<2);
 			MenuPrincipal();
 		}
 		public void IniciandoJuego()
@@ -51,12 +51,11 @@ namespace juegoIA
 			string BarraDeCarga="";
 			while(LoadingGame<=100)
 			{
-				BarraDeCarga=BarraDeCarga+"I";
+				BarraDeCarga=BarraDeCarga+"II";
 				Iniciador(BarraDeCarga,LoadingGame);
 				LoadingGame++;
+				LoadingGame++;
 			}
-//			Console.WriteLine("\n\n\t\t\t\t\t[/(*U*)/][JUEGO-CARGADO-EXITOSAMENTE][/(*U*)/]");
-//			Console.ReadKey();
 			Console.Clear();
 			Console.WriteLine("=======================================================================================================================");
 			Console.WriteLine("                                                   MENU-GAME                                                           ");
@@ -80,19 +79,9 @@ namespace juegoIA
 			Console.WriteLine("=======================================================================================================================");
 			Console.WriteLine("                                                 INICIANDO-JUEGO                                                       ");
 			Console.WriteLine("=======================================================================================================================");
-			Thread.Sleep(17);
+			Thread.Sleep(15);
 			Console.Write("\n  Loading ["+BarraDeCarga+"]"+"["+LoadingGame+"%]");
-			Console.Write("\n\n");
-		}
-		public void IniciadorMiniMax(string BarraDeCarga,int LoadingGame)
-		{
-			Console.Clear();
-			Console.WriteLine("=======================================================================================================================");
-			Console.WriteLine("                                                 CONSTRUYENDO-ARBOL                                                    ");
-			Console.WriteLine("=======================================================================================================================");
-			Thread.Sleep(17);
-			Console.Write("\n  Loading ["+BarraDeCarga+"]"+"["+LoadingGame+"%]");
-			Console.Write("\n\n");
+			
 		}
 	}
 }
